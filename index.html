@@ -430,14 +430,34 @@ function playFavouriteMusic(el){
   if(!CONFIG.favouriteMusic) return;
   if(a.src!==CONFIG.favouriteMusic) a.src=CONFIG.favouriteMusic;
   const bg=$("bgMusic");
+
   if(!a.paused){
+    // Favourite music is playing -> stop it and resume bg music if it was on
     a.pause();
     el.querySelector("span").textContent="FAVOURITE MUSIC";
+    if(bg.dataset.pausedForFav==="1"){
+      bg.dataset.pausedForFav="";
+      bg.play().then(()=>{$("musicBtn").textContent="❚❚"}).catch(()=>{});
+    }
     return;
   }
+
+  // About to play favourite music -> pause bg music (remember if it was playing)
+  if(!bg.paused){
+    bg.dataset.pausedForFav="1";
+    bg.pause();
+    $("musicBtn").textContent="♫";
+  }
+
   a.play().then(()=>{
     el.querySelector("span").textContent="PAUSE MUSIC";
-    a.onended=()=>{el.querySelector("span").textContent="FAVOURITE MUSIC"};
+    a.onended=()=>{
+      el.querySelector("span").textContent="FAVOURITE MUSIC";
+      if(bg.dataset.pausedForFav==="1"){
+        bg.dataset.pausedForFav="";
+        bg.play().then(()=>{$("musicBtn").textContent="❚❚"}).catch(()=>{});
+      }
+    };
   }).catch(()=>{});
 }
 
@@ -479,12 +499,13 @@ async function loadCardAndInit(){
       const {initializeApp}=await import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js");
       const {getFirestore,doc,getDoc}=await import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js");
       const firebaseConfig={
-        apiKey:"AIzaSyCRAO7UDddKfkVbGGBBtkruD22NZnNozU",
-        authDomain:"soravtemps-d5419.firebaseapp.com",
-        projectId:"soravtemps-d5419",
-        storageBucket:"soravtemps-d5419.firebasestorage.app",
-        messagingSenderId:"889624784593",
-        appId:"1:889624784593:web:3a325467962639facedff0"
+        apiKey:"AIzaSyDneahIyDuurQB30uGrM0iC6xkDv71yUjo",
+        authDomain:"ditemps.firebaseapp.com",
+        projectId:"ditemps",
+        storageBucket:"ditemps.firebasestorage.app",
+        messagingSenderId:"14858245467",
+        appId:"1:14858245467:web:97cdf1133278e001c6367e",
+        measurementId:"G-9W89PHQQQ7"
       };
       const app=initializeApp(firebaseConfig);
       const db=getFirestore(app);
